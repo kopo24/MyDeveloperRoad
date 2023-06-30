@@ -1,0 +1,22 @@
+### Example user template template
+### Example user template
+
+# Maven
+log/
+target/
+
+# IntelliJ project files
+.idea
+*.iml
+out
+gen
+.mvn
+*.iws
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Mac
+.DS_Store

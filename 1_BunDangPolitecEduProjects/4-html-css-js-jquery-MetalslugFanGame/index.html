@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>메탈술뤄그</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    #container {
+      position: absolute;
+      width: 1200px;
+      height: 600px;
+      border: 1px solid black;
+    }
+
+    #monkey {
+      position: absolute;
+      width: 64px;
+      top: -8px;
+      left: -8px;
+    }
+
+    #user {
+      position: absolute;
+      width: 80px;
+      bottom: 0px;
+      left: 0px;
+    }
+
+    #bullet {
+      position: absolute;
+      width: 400px;
+      bottom: 0px;
+      left: 0px;
+    }
+
+    #enemy1 {
+      position: absolute;
+      width: 80px;
+      bottom: 0px;
+      right: 0px;
+    }
+
+    #metalslug {
+      position: absolute;
+      height: 80px;
+      bottom: 0px;
+      left: 80px;
+      display: none;
+    }
+
+    #myscore {
+      position: absolute;
+      margin: 0px;
+      background: white;
+      opacity: 0.5;
+    }
+
+    #backgroundStart {
+      border: 0px;
+      position: absolute;
+      width: 294px;
+      height: 291px;
+      top: 45%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: url(backgroundStart.gif);
+      background-size: contain;
+    }
+
+    #buttonStart {
+      border: 0px;
+      position: absolute;
+      width: 125px;
+      height: 40px;
+      top: 100%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: url(startbutton.png);
+      background-size: contain;
+    }
+
+    #boom1 {
+      position: absolute;
+      bottom: 0%;
+    }
+
+    #background {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: url(background.gif);
+      background-size: contain;
+      animation-name: bg-slide;
+      animation-duration: 20s;
+      animation-iteration-count: infinite;
+      animation-timing-function: linear;
+      background-position: 0px center;
+    }
+
+    #moden1 {
+      position: absolute;
+      width: 100%;
+      height: 224px;
+      bottom: 10%;
+      background: url(moden.gif);
+      background-size: 304px 224px;
+      animation-name: bg-slide;
+      animation-duration: 20s;
+      animation-iteration-count: infinite;
+      animation-timing-function: linear;
+      background-position: 0px center;
+    }
+
+    #moden2 {
+      position: absolute;
+      width: 100%;
+      height: 224px;
+      bottom: 0%;
+      right: 152px;
+      background: url(moden.gif);
+      background-size: 304px 224px;
+      animation-name: bg-slide;
+      animation-duration: 20s;
+      animation-iteration-count: infinite;
+      animation-timing-function: linear;
+      background-position: 0px center;
+    }
+
+    @keyframes bg-slide {
+      from {
+        background-position: 0px center;
+      }
+
+      to {
+        background-position: -300px center;
+      }
+    }
+
+    #whiteHide {
+      position: absolute;
+      width: 200px;
+      height: 600px;
+      left: 1200px;
+      border: 1px solid white;
+      background: white;
+      z-index: +1;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="background"></div>
+    <div id="moden1"></div>
+    <div id="moden2"></div>
+    <div id="whiteHide"></div>
+    <img id="boom1" src="boom1.gif" alt="">
+    <img id="monkey" src="monkey.gif" alt="">
+    <img id="user" src="user.gif" alt="">
+    <img id="bullet" src="bullet.gif" alt="">
+    <img id="enemy1" src="enemy1.gif" alt="">
+    <img id="metalslug" src="pressA.gif" alt="">
+    <span id="myscore">score : <span id="scoring">0</span></span>
+    <div id="backgroundStart"><button id="buttonStart" onclick="gameStart()"></button></div>
+  </div>
+
+  <script>
+    let user = $("#user"); // 주인공 점프에 사용
+    let isJumping = false; // 키보드 영역에 사용
+    let enemy1 = $("#enemy1");
+    let score = 0; // 점수
+    let isAttack2 = false;
+    let metalslug = $("#metalslug");
+    let noStart = true; // 시작버튼 누르기 전까지 enemy1 고정
+    let hitusertack = false; // 냥택 히트조건이면 true로 바뀜
+
+    $(function () {
+      $("#user").css("display", "none");
+      $("#enemy1").css("display", "none");
+      $("#myscore").css("display", "none");
+      $("#boom1").css("display", "none");
+      $("#bullet").css("display", "none");
+    });
+
+    function gameStart() {
+      $("#user").css("display", "flex");
+      $("#enemy1").css("display", "flex");
+      $("#myscore").css("display", "flex");
+      $("#buttonStart").css("display", "none");
+      $("#backgroundStart").css("display", "none");
+      noStart = false;
+      score = 0;
+    }
+
+    // 주인공 점프
+    function jump() {
+      isJumping = true;
+      user.animate({
+        bottom: "+=150px"
+      }).animate({
+        bottom: "-=150px"
+      }, 1000, function () {
+        isJumping = false;
+      });
+    }
+
+    // 주인공 총 공격
+    function attack1() {
+      $("#user").attr("src", "bullet.gif");
+      $("#user").attr("id", "bullet");
+      // $("#user").css("display", "flex");
+      // $("#bullet").css("display", "none");
+    }
+
+    // 주인공 메탈슬러그공격
+    function attack2() {
+      let metalslugX = // 화면 좌측 끝부터 장풍 우측면 까지의 길이
+        parseInt(metalslug.css("left").replace("px", "")) +
+        parseInt(metalslug.css("width").replace("px", ""));
+      let enemy1LeftX = parseInt(enemy1.css("left").replace("px", "")); // 적 왼쪽 면
+      isAttack2 = true;
+      $("#metalslug").css("display", "flex");
+      $("#metalslug").animate({ left: "120%" }, 3000, function () {
+        $("#metalslug").css("left", "80px");
+        isAttack2 = false;
+        $("#metalslug").css("display", "none");
+      });
+    }
+
+    // 적 이동
+    function enemy1Move() {
+      if (noStart == false) {
+        $("#enemy1").animate({ right: "120%" }, 3000, function () {
+          $("#enemy1").css("right", "-100px");
+          score += 100;
+        });
+      }
+    }
+
+    // 득점 조건(= DIE & ATTACK)
+    function deadCheck() {
+      let isDead = false;
+
+      let enemy1LeftX = parseInt(enemy1.css("left").replace("px", "")); // 적 왼쪽 면
+      let userRightX = // 유저 우측의 x축 위치
+        parseInt(user.css("left").replace("px", "")) +
+        parseInt(user.css("width").replace("px", ""));
+      let userLeftX = // 유저 좌측에서 x축 1/2지점
+        parseInt(user.css("left").replace("px", "")) +
+        parseInt(user.css("width").replace("px", "")) * 0.5;
+      let userHeightY = parseInt(user.css("bottom").replace("px", "")); // 유저 밑 면
+
+      let enemy1HeightY = // 적 y축 길이
+        parseInt(enemy1.css("bottom").replace("px", "")) +
+        parseInt(enemy1.css("height").replace("px", ""));
+
+      if (userLeftX < enemy1LeftX && enemy1LeftX < userRightX && userHeightY < enemy1HeightY) {
+        isDead = true;
+      }
+
+      return isDead;
+    }
+
+    function crashCheck() {
+      isCrash = false;
+
+      let userRightX = // 유저 우측의 x축 위치
+        parseInt(user.css("left").replace("px", "")) +
+        parseInt(user.css("width").replace("px", ""));
+      let enemy1LeftX = parseInt(enemy1.css("left").replace("px", "")); // 적 왼쪽 면
+      let metalslugX = // 화면 좌측 끝부터 장풍 우측면 까지의 길이
+        parseInt(metalslug.css("left").replace("px", "")) +
+        parseInt(metalslug.css("width").replace("px", ""));
+
+      if (userRightX < enemy1LeftX && enemy1LeftX < metalslugX && $("#metalslug").is(":visible")) {
+        isCrash = true;
+      }
+
+      return isCrash;
+    }
+
+    // 키보드 영역
+    $("body").keydown(function (event) {
+      // console.log(event.code); // 키보드 이름 알아내는 코드
+      switch (event.code) {
+        case "Space":
+          // 스페이스 연타 방지
+          if (isJumping == false) {
+            jump();
+          }
+          break;
+        case "KeyA":
+          if (isAttack2 == false && isJumping == false) { // 점프공격 금지!
+            attack2();
+          }
+          break;
+        case "KeyD":
+          if (isAttack2 == false && isJumping == false) {
+            attack1();
+          }
+          break;
+      }
+    });
+
+    function monkeyMove() {
+      $("#monkey").animate({ left: "1136px" }, 10000, function () {
+        $("#monkey").css("left", "-8px");
+      });
+    }
+
+    setInterval(function () {
+      // 적 이동
+      enemy1Move();
+      monkeyMove();
+
+      // 죽었는지 체크
+      if (deadCheck()) {
+        alert("YOU DIED : " + score);
+        window.location.reload();
+        // console.log("YOU DIED");
+      }
+
+      if (crashCheck()) {
+        let metalslugX = // 화면 좌측 끝부터 장풍 우측면 까지의 길이
+          parseInt(metalslug.css("left").replace("px", "")) +
+          parseInt(metalslug.css("width").replace("px", ""));
+
+        $("#boom1").animate({ left: metalslugX + "px" }, 1).css("display", "block");
+        $("#boom1").fadeOut(500);
+        $("#enemy1").stop(false, true);
+        $("#metalslug").stop(false, true);
+        score += 100;
+      }
+
+      $("#scoring").text(score);
+    }, 33);
+
+  </script>
+
+</body>
+
+</html>
